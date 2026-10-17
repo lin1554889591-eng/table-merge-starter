@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="在你的瀏覽器中合併 Excel 與 CSV、檢查重複資料，並保留每一列的來源。">
+  <meta name="theme-color" content="#176b50">
+  <title>表格小幫手 · TableMerge Starter</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/xlsx.full.min.js"></script>
+  <script defer src="merge-core.js"></script>
+  <script defer src="table-io.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">跳到表格整理區</a>
+  <header class="site-header shell">
+    <a class="brand" href="./" aria-label="表格小幫手首頁"><img src="icon.svg" alt="" width="36" height="36"><span>表格小幫手<small>TABLEMERGE STARTER</small></span></a>
+    <span class="privacy-tag"><span class="status-dot"></span>檔案在你的裝置處理</span>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="main-title">
+      <div><p class="eyebrow">少一點複製貼上，多一點時間。</p><h1 id="main-title">讓散落的表格，<br><span>回到同一張。</span></h1><p class="hero-copy">放入 Excel 或 CSV，對齊欄位、檢查重複，<br class="desktop-break">再帶走一份清楚、可追溯的合併結果。</p></div>
+      <div class="hero-side"><div class="mini-sheets" aria-hidden="true"><div class="sheet sheet-back"><i></i><i></i><i></i><i></i></div><div class="sheet sheet-front"><span>整理完成</span><i></i><i></i><i></i><b>✓</b></div></div><p>每一列，都找得到來處。</p></div>
+    </section>
+    <div id="alerts" class="alerts" role="status" aria-live="polite" hidden></div>
+    <section id="workspace" class="workspace" aria-label="表格整理區">
+      <div class="card input-card">
+        <div class="section-heading"><div><p class="step-label">01 / 放入資料</p><h2>把要合併的檔案放在這裡</h2></div><button id="clear-files" class="text-button" type="button" hidden>清空</button></div>
+        <div id="drop-zone" class="drop-zone">
+          <svg class="upload-icon" width="42" height="42" viewBox="0 0 42 42" aria-hidden="true"><path d="M8 28v7h26v-7M21 28V7m-8 8 8-8 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>拖曳檔案，或從裝置選取</h3><p>.xlsx、.csv · 可一次選擇多份</p>
+          <input id="file-input" class="visually-hidden" type="file" accept=".xlsx,.csv" multiple aria-label="選擇 Excel 或 CSV 檔案">
+          <button id="choose-files" class="button button-primary" type="button">選擇檔案 <span aria-hidden="true">＋</span></button>
+        </div>
+        <div class="demo-bar"><span>還沒有檔案？先用虛構的銷售資料試試。</span><button id="load-demo" class="text-button" type="button">載入範例 <span aria-hidden="true">↗</span></button></div>
+        <div id="file-list" class="file-list" aria-label="已載入檔案"></div>
+        <p class="input-note">一次最多 20 份，每份 5 MiB、合計 20 MiB。第一個有內容的列會作為欄位名稱；每份 Excel 選擇一張工作表。</p>
+      </div>
+      <aside class="card settings-card" aria-labelledby="settings-title">
+        <div class="section-heading"><div><p class="step-label">02 / 決定整理方式</p><h2 id="settings-title">保留你需要的資料</h2></div></div>
+        <label class="field-label" for="merge-mode">欄位如何對齊</label>
+        <select id="merge-mode"><option value="union">保留全部欄位（建議）</option><option value="intersection">只保留每份表格都有的欄位</option></select>
+        <p class="field-help">依相同欄名對齊；某份檔案缺少的欄位留空。</p>
+        <div class="setting-divider"></div>
+        <label class="check-row"><input id="dedupe" type="checkbox"><span><strong>移除重複列</strong><small>相同資料保留匯入順序中的第一筆。</small></span></label>
+        <details class="key-details"><summary>設定用哪些欄位判斷重複</summary><p class="field-help">未勾選時，會比對全部合併欄位。只選編號時，同編號的不同內容也會視為重複。</p><fieldset id="key-columns" aria-label="判斷重複的欄位"><legend class="visually-hidden">判斷重複的欄位</legend><span class="muted">載入檔案後可選擇</span></fieldset></details>
+        <div class="setting-divider"></div>
+        <label class="check-row"><input id="include-source" type="checkbox" checked><span><strong>匯出時附上來源</strong><small>原始檔名、工作表與原始列號。</small></span></label>
+        <details class="advanced"><summary>CSV 編碼與使用說明</summary><label class="field-label" for="csv-encoding">CSV 讀取編碼</label><select id="csv-encoding"><option value="utf-8">UTF-8（預設）</option><option value="big5">Big5（舊式繁中檔案）</option></select><p class="field-help">變更編碼會重新讀取已載入的 CSV。欄名會去除首尾空白，內容保留原樣。</p><p class="field-help">合計最多 20,000 列、每張表格最多 200 欄與合計 500,000 個欄位值。Excel 讀入顯示值，樣式與公式不會保留；公式使用檔案內已儲存的結果。</p></details>
+        <button id="run-merge" class="button button-primary merge-button" type="button" disabled>合併並檢查 <span aria-hidden="true">→</span></button><p id="merge-hint" class="merge-hint">先放入檔案，或載入範例資料。</p>
+      </aside>
+    </section>
+    <section id="results" class="card result-card" aria-labelledby="results-title" hidden>
+      <div class="section-heading result-heading"><div><p class="step-label">03 / 檢查與帶走</p><h2 id="results-title">合併結果</h2><p id="result-subtitle" class="field-help"></p></div><div class="export-actions"><button id="download-csv" class="button button-secondary" type="button">下載 CSV</button><button id="download-xlsx" class="button button-primary" type="button">下載 Excel <span aria-hidden="true">↓</span></button></div></div>
+      <div class="stats"><div><span>讀入資料</span><strong id="stat-input">0</strong><small>列</small></div><div><span>合併後保留</span><strong id="stat-output">0</strong><small>列</small></div><div><span id="duplicate-label">發現重複</span><strong id="stat-duplicate">0</strong><small>列</small></div><div><span>合併欄位</span><strong id="stat-columns">0</strong><small>欄</small></div></div>
+      <div class="result-controls"><div class="search-field"><label class="visually-hidden" for="search">搜尋預覽資料</label><input id="search" type="search" placeholder="搜尋預覽中的資料…" autocomplete="off"></div><div class="sum-field"><label for="sum-column">數值加總</label><select id="sum-column"><option value="">選擇欄位</option></select></div></div>
+      <p id="sum-result" class="sum-result" hidden></p>
+      <details id="result-warnings" class="warnings" hidden><summary>資料整理提醒</summary><ul id="warning-list"></ul></details>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="合併資料預覽，可水平捲動"><table><caption class="visually-hidden">合併資料預覽，每頁 50 列</caption><thead id="preview-head"></thead><tbody id="preview-body"></tbody></table></div>
+      <div class="table-footer"><span id="page-caption"></span><div class="pagination"><button id="prev-page" class="button button-small" type="button" aria-label="上一頁">←</button><button id="next-page" class="button button-small" type="button" aria-label="下一頁">→</button></div></div>
+      <p class="export-note">搜尋只影響預覽，下載仍包含全部合併結果。Excel 以文字儲存欄位值以保留編號；CSV 會替可能被當作公式的內容加上前置單引號。</p>
+    </section>
+    <section class="how-it-works" aria-label="使用特色"><div><span>01</span><h3>欄位順序不同，也能對齊</h3><p>以欄位名稱配對，不需要先把每份表格排成相同順序。</p></div><div><span>02</span><h3>先檢查，再決定是否移除</h3><p>列出重複筆數，保留選擇權；資料內容不自動修剪或改寫。</p></div><div><span>03</span><h3>處理完成，資料由你帶走</h3><p>程式不傳送你的表格內容。關閉或重新整理頁面，工作資料就會清除。</p></div></section>
+  </main>
+  <footer class="site-footer shell"><span>表格小幫手 <span class="footer-dot">·</span> v0.1.0</span><span>一個小工具，做好一件日常工作。</span></footer>
+  <noscript><p class="shell">請啟用 JavaScript，才能在你的瀏覽器中處理表格。</p></noscript>
+</body>
+</html>

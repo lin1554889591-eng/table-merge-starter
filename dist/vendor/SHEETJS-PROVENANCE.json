@@ -1,0 +1,22 @@
+{
+  "package": "xlsx",
+  "version": "0.20.3",
+  "source": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+  "documentation": "https://docs.sheetjs.com/docs/getting-started/installation/standalone/",
+  "archive_sha256": "8dc73fc3b00203e72d176e85b50938627c7b086e607c682e8d3c22c02bb99fe8",
+  "files": [
+    {
+      "file": "xlsx.full.min.js",
+      "archive_entry": "package/dist/xlsx.full.min.js",
+      "bytes": 951904,
+      "sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41"
+    },
+    {
+      "file": "SHEETJS-LICENSE.txt",
+      "archive_entry": "package/LICENSE",
+      "bytes": 11355,
+      "sha256": "4d2a38ac35cda06a555c84074a819d413339cd3691b822cae50f8f322fe01f64"
+    }
+  ],
+  "verification": "Downloaded over HTTPS from the exact release archive documented by the official project; verified package.json name/version and the browser distribution version assignment without executing the package. SHA-256 hashes record the retrieved bytes, not an independently signed authenticity guarantee."
+}
